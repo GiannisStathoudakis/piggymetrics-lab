@@ -122,10 +122,3 @@
     - name: 17. Print the RKE2 node token
       ansible.builtin.debug:
         msg: "RKE2 Node Token is: {{ rke2_token_file.content | b64decode | trim }}"
-        
-  handlers:
-    - name: Reload NetworkManager
-      ansible.builtin.systemd:
-        name: NetworkManager
-        state: reloaded
-      failed_when: false
