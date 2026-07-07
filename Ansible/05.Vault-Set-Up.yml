@@ -1,0 +1,40 @@
+---
+- hosts: master
+  tasks:
+
+    - name: 01a. Copy script to master node
+      become: false
+      ansible.builtin.copy:
+        src: files/vault-init.sh
+        dest: /tmp/vault-init.sh
+
+    - name: 01b. Copy script from master node into pod
+      ansible.builtin.shell: /var/lib/rancher/rke2/bin/kubectl cp /tmp/vault-init.sh vault/vault-0:/tmp/vault-init.sh
+
+    - name: 02. Execute Vault setup script inside Pod
+      kubernetes.core.k8s_exec:
+        namespace: vault
+        pod: vault-0
+        command: sh /tmp/vault-init.sh
+
+    - name: 03. Read cluster-keys.json from Pod
+      kubernetes.core.k8s_exec:
+        namespace: vault
+        pod: vault-0
+        command: cat /tmp/cluster-keys.json
+      register: vault_keys_output
+      failed_when: false
+
+    - name: 04. Save cluster keys to local Desktop
+      ansible.builtin.copy:
+        content: "{{ vault_keys_output.stdout }}"
+        dest: "~/Desktop/cluster-keys.json"
+        mode: '0600' 
+      delegate_to: localhost
+      when: vault_keys_output.rc == 0 and vault_keys_output.stdout != ""
+
+    - name: 05. Clean up sensitive files
+      kubernetes.core.k8s_exec:
+        namespace: vault
+        pod: vault-0
+        command: rm -f /tmp/cluster-keys.json /tmp/vault-init.sh
