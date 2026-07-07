@@ -5,7 +5,7 @@
     admin_user: "{{ ansible_user | default('ubuntu') }}"
   
   vars_files:
-    - secrets.yml
+    - files/secrets.yml
 
   tasks:
     - name: 01. Install updates for Ubuntu
