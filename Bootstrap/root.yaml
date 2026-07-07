@@ -9,7 +9,7 @@ spec:
         elements:
 
           - app: vault
-            path: Apps/vault
+            path: Apps/Vault
           - app: cert-manager
             path: Apps/Cert-manager
           - app: eso
