@@ -64,7 +64,7 @@
         dest: /etc/rancher/rke2/config.yaml
         content: |
           write-kubeconfig-mode: "0644"
-          cni: cilium
+          cni: none
           disable:
             - rke2-ingress-nginx
             - rke2-traefik
