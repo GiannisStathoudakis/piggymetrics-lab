@@ -1,0 +1,20 @@
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: lab-pool
+  namespace: kube-system
+spec:
+  blocks:
+  - cidr: "192.168.80.130/32"
+---
+apiVersion: "cilium.io/v2alpha1"
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: l2-policy
+  namespace: kube-system
+spec:
+  serviceSelector:
+    matchLabels:
+      io.cilium/gateway-name: lab-gateway
+  interfaces:
+  - ens33
