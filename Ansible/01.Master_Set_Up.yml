@@ -121,10 +121,3 @@
     - name: 17. Print the RKE2 node token
       ansible.builtin.debug:
         msg: "RKE2 Node Token is: {{ rke2_token_file.content | b64decode | trim }}"
-
-    - name: 18. Disable Root SSH Login
-      ansible.builtin.lineinfile:
-        path: /etc/ssh/sshd_config
-        regexp: '^#?PermitRootLogin'
-        line: 'PermitRootLogin no'
-      notify: Restart SSH
