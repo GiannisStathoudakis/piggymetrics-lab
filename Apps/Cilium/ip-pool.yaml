@@ -3,6 +3,8 @@ kind: CiliumLoadBalancerIPPool
 metadata:
   name: lab-pool
   namespace: kube-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   blocks:
   - cidr: "192.168.80.130/32"
@@ -12,6 +14,8 @@ kind: CiliumL2AnnouncementPolicy
 metadata:
   name: l2-policy
   namespace: kube-system
+  annotations:
+    argocd.argoproj.io/sync-wave: "3"
 spec:
   serviceSelector:
     matchLabels:

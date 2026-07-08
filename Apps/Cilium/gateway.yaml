@@ -3,10 +3,9 @@ kind: Gateway
 metadata:
   name: lab-gateway
   namespace: gateway 
-  
   annotations:
     cert-manager.io/cluster-issuer: vault-issuer
-    argocd.argoproj.io/sync-wave: "2"
+    argocd.argoproj.io/sync-wave: "4"
 spec:
   gatewayClassName: cilium 
   listeners:
@@ -18,6 +17,6 @@ spec:
       mode: Terminate
       certificateRefs:
       - name: lab-wildcard-tls 
-    allowedRoutes:
-      namespaces:
-        from: All
+  allowedRoutes:
+    namespaces:
+      from: All
