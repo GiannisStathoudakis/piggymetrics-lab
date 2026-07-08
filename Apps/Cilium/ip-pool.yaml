@@ -17,8 +17,4 @@ metadata:
   annotations:
     argocd.argoproj.io/sync-wave: "3"
 spec:
-  serviceSelector:
-    matchLabels:
-      io.cilium/gateway-name: lab-gateway
-  interfaces:
-  - ens33
+  loadBalancerIPs: true
