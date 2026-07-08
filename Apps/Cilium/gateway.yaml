@@ -3,8 +3,10 @@ kind: Gateway
 metadata:
   name: lab-gateway
   namespace: gateway 
+  
   annotations:
     cert-manager.io/cluster-issuer: vault-issuer
+    argocd.argoproj.io/sync-wave: "2"
 spec:
   gatewayClassName: cilium 
   listeners:
