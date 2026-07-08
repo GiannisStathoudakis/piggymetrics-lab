@@ -13,10 +13,10 @@ spec:
     protocol: HTTPS
     port: 443
     hostname: "*.lab.internal"
+    allowedRoutes:
+      namespaces:
+        from: All
     tls:
       mode: Terminate
       certificateRefs:
-      - name: lab-wildcard-tls 
-  allowedRoutes:
-    namespaces:
-      from: All
+      - name: lab-wildcard-tls
