@@ -65,6 +65,7 @@
         content: |
           write-kubeconfig-mode: "0644"
           cni: none
+          disable-kube-proxy: true
           disable:
             - rke2-ingress-nginx
             - rke2-traefik
