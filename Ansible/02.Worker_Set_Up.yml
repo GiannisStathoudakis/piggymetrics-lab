@@ -1,4 +1,5 @@
 ---
+#ansible-vault <decrypt/encrypt> secrets.yml
 - hosts: worker
   become: true
   vars:

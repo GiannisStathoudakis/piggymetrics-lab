@@ -13,8 +13,10 @@ spec:
             path: Apps/Cert-manager
           - app: eso
             path: Apps/External-Secrets
-          - app: cilium
-            path: Apps/Cilium
+          #- app: cilium
+          #  path: Apps/Cilium
+          #- app: argocd
+          #  path: Apps/Argocd
 
   template:
     metadata:

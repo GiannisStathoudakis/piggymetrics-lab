@@ -16,3 +16,8 @@
             name: local-path
             annotations:
               storageclass.kubernetes.io/is-default-class: "true"
+
+    - name: 03. Install gateway-api
+      kubernetes.core.k8s:
+        state: present
+        src: https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.6.0/standard-install.yaml
