@@ -1,0 +1,68 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://argoproj.github.io/argo-helm
+    chart: argo-cd
+    targetRevision: 10.1.2
+    helm:
+      values: |
+        dex:
+          enabled: false
+
+        global:
+          domain: argocd.lab.internal
+          
+        fullnameOverride: "argocd"
+
+        server:
+          extraArgs:
+            - --insecure
+          config:
+            url: https://argocd.lab.internal
+          
+          ingress:
+            enabled: false
+          metrics:
+            enabled: true
+            service:
+              annotations:
+                prometheus.io/scrape: "true"
+                prometheus.io/port: "8083"
+
+        controller:
+          metrics:
+            enabled: true
+            service:
+              annotations:
+                prometheus.io/scrape: "true"
+                prometheus.io/port: "8082"
+
+        repoServer:
+          metrics:
+            enabled: true
+            service:
+              annotations:
+                prometheus.io/scrape: "true"
+                prometheus.io/port: "8084"
+
+        applicationSet:
+          metrics:
+            enabled: true
+            service:
+              annotations:
+                prometheus.io/scrape: "true"
+                prometheus.io/port: "8080"
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true
