@@ -15,8 +15,8 @@ spec:
             path: Apps/External-Secrets
           - app: cilium
             path: Apps/Cilium
-          #- app: argocd
-          #  path: Apps/Argocd
+          - app: argocd
+            path: Apps/Argocd
 
   template:
     metadata:
