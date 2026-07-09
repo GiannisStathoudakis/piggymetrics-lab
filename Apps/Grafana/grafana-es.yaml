@@ -13,9 +13,9 @@ spec:
   data:
   - secretKey: admin-user
     remoteRef:
-      key: secret/grafana
+      key: secret/Grafana
       property: admin-user
   - secretKey: admin-password
     remoteRef:
-      key: secret/grafana
+      key: secret/Grafana
       property: admin-password
