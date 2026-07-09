@@ -9,7 +9,6 @@ metadata:
 spec:
   gatewayClassName: cilium 
   listeners:
-  # --- NEW: Catch plain HTTP traffic on port 80 ---
   - name: http
     protocol: HTTP
     port: 80
@@ -18,7 +17,6 @@ spec:
       namespaces:
         from: All
         
-  # --- EXISTING: Handle secured HTTPS traffic on port 443 ---
   - name: https
     protocol: HTTPS
     port: 443
