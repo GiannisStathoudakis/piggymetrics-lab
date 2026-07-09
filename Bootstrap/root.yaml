@@ -23,8 +23,8 @@ spec:
             path: Apps/Grafana
           - app: garage
             path: Apps/Garage
-          - app: Loki
-            path: Apps/loki
+          - app: loki
+            path: Apps/Loki
 
   template:
     metadata:
