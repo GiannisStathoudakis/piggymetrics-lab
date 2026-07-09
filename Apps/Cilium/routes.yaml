@@ -80,7 +80,6 @@ kind: HTTPRoute
 metadata:
   name: grafana-route
   namespace: grafana
-  annotations:
 spec:
   parentRefs:
   - name: lab-gateway
