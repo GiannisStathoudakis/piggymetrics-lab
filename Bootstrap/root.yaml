@@ -19,6 +19,8 @@ spec:
             path: Apps/Argocd
           - app: longhorn
             path: Apps/Longhorn
+          - app: grafana
+            path: Apps/Grafana
 
   template:
     metadata:

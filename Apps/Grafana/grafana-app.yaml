@@ -1,0 +1,48 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: grafana
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "5"
+spec:
+  project: default
+  source:
+    repoURL: https://grafana-community.github.io/helm-charts
+    chart: grafana
+    targetRevision: 12.7.2
+    helm:
+      values: |
+        admin:
+          existingSecret: "grafana-admin-credentials"
+          userKey: admin-user
+          passwordKey: admin-password
+        persistence:
+          enabled: true
+          storageClassName: "longhorn"
+          size: 2Gi
+        global:
+          imageRegistry: docker.io
+        service:
+          type: ClusterIP
+          port: 80
+          targetPort: 3000
+        podSecurityContext:
+          fsGroup: 472
+        containerSecurityContext:
+          runAsGroup: 472
+          runAsUser: 472
+        sidecarNodes: true 
+        rbac:
+          create: true
+        initChownData:
+          enabled: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: grafana
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:  
+      - CreateNamespace=true
