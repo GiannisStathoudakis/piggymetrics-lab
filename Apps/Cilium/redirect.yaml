@@ -8,6 +8,8 @@ spec:
   - name: lab-gateway
     namespace: gateway
     sectionName: http
+  hostnames:
+  - "*.lab.internal"
   rules:
   - filters:
     - type: RequestRedirect
