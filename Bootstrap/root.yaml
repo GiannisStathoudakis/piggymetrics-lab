@@ -25,7 +25,7 @@ spec:
             path: Apps/Garage
           - app: loki
             path: Apps/Loki
-          - app: voctoriaMetrics
+          - app: victoriaMetrics
             path: Apps/VictoriaMetrics
 
   template:
