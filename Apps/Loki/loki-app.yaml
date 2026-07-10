@@ -49,6 +49,9 @@ spec:
           basicAuth:
             enabled: false
 
+        gateway:
+          enabled: false
+
         singleBinary:
           replicas: 1
 
