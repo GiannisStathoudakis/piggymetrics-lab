@@ -17,6 +17,9 @@ spec:
           type: daemonset
 
         alloy:
+          mounts:
+            varlog: true
+
           configMap:
             content: |-
               // ==========================================
