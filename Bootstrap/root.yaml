@@ -25,7 +25,7 @@ spec:
             path: Apps/Garage
           - app: loki
             path: Apps/Loki
-          - app: victoriaMetrics
+          - app: victoria-metrics
             path: Apps/VictoriaMetrics
           - app: node-exporter
             path: Apps/Node-exporter
