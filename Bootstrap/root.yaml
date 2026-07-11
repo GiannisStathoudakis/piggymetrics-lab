@@ -31,6 +31,8 @@ spec:
             path: Apps/Node-exporter
           - app: tempo
             path: Apps/Tempo
+          - app: alloy
+            path: Apps/Alloy
 
   template:
     metadata:
