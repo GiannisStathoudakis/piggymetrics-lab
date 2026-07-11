@@ -34,7 +34,6 @@
       ansible.builtin.command: "{{ kubectl_cmd }} exec -n garage garage-0 -- ./garage bucket create {{ item }}"
       loop:
         - loki-logs
-        - mimir-blocks
         - tempo-traces
       register: bucket_creation
       changed_when: "'created' in bucket_creation.stdout | lower"
@@ -44,7 +43,6 @@
       ansible.builtin.command: "{{ kubectl_cmd }} exec -n garage garage-0 -- ./garage key create {{ item }}-key"
       loop:
         - loki
-        - mimir
         - tempo
       register: api_keys
       changed_when: "'Secret key' in api_keys.stdout"
@@ -55,7 +53,6 @@
         {{ kubectl_cmd }} exec -n garage garage-0 -- ./garage bucket allow {{ item.bucket }} --read --write --owner --key {{ item.key }}-key
       loop:
         - { bucket: 'loki-logs', key: 'loki' }
-        - { bucket: 'mimir-blocks', key: 'mimir' }
         - { bucket: 'tempo-traces', key: 'tempo' }
       changed_when: false
       ignore_errors: true
