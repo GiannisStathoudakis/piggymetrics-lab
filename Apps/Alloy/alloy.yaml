@@ -84,7 +84,7 @@ spec:
               }
 
               // ==========================================
-              // Tempo
+              // Tempo & VictoriaMetrics)
               // ==========================================
               
               otelcol.receiver.otlp "default" {
@@ -92,9 +92,11 @@ spec:
                 http { endpoint = "0.0.0.0:4318" }
                 output {
                   traces  = [otelcol.exporter.otlp.tempo.input]
+                  metrics = [otelcol.exporter.prometheus.to_victoriametrics.input]
                 }
               }
               
+              // Export traces directly to Tempo
               otelcol.exporter.otlp "tempo" {
                 client {
                   endpoint = "tempo.tempo.svc.cluster.local:4317"
@@ -103,6 +105,11 @@ spec:
                     insecure_skip_verify = true
                   }
                 }
+              }
+
+              // Translate OpenTelemetry metrics to Prometheus format for VictoriaMetrics
+              otelcol.exporter.prometheus "to_victoriametrics" {
+                forward_to = [prometheus.remote_write.victoriametrics.receiver]
               }
               
   destination:
