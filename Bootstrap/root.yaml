@@ -27,6 +27,8 @@ spec:
             path: Apps/Loki
           - app: victoriaMetrics
             path: Apps/VictoriaMetrics
+          - app: node-exporter
+            path: Apps/Node-exporter
 
   template:
     metadata:
