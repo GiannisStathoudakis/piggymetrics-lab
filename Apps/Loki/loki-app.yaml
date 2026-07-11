@@ -41,7 +41,6 @@ spec:
               admin: loki-logs
             s3:
               endpoint: garage.garage.svc.cluster.local:3900
-              region: garage
               s3ForcePathStyle: true
               insecure: true
         
