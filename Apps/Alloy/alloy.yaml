@@ -57,6 +57,10 @@ spec:
               
               discovery.kubernetes "pods" {
                 role = "pod"
+                selectors {
+                  role  = "pod"
+                  field = "spec.nodeName=" + sys.env("HOSTNAME")
+                }
               }
               
               discovery.relabel "pod_logs" {
@@ -73,10 +77,22 @@ spec:
                   source_labels = ["__meta_kubernetes_pod_container_name"]
                   target_label  = "container"
                 }
+                rule {
+                  source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+                  target_label  = "__path__"
+                  separator     = "/"
+                  replacement   = "/var/log/pods/*$1/*.log"
+                }
               }
               
-              loki.source.kubernetes "cluster_logs" {
-                targets    = discovery.relabel.pod_logs.output
+              // Match the generated K8s metadata paths to the physical files on disk
+              local.file_match "pod_logs" {
+                path_targets = discovery.relabel.pod_logs.output
+              }
+              
+              // Read the files and push to Loki
+              loki.source.file "cluster_logs" {
+                targets    = local.file_match.pod_logs.targets
                 forward_to = [loki.write.loki.receiver]
               }
               
@@ -87,7 +103,7 @@ spec:
               }
 
               // ==========================================
-              // Tempo & VictoriaMetrics)
+              // Tempo & VictoriaMetrics
               // ==========================================
               
               otelcol.receiver.otlp "default" {
@@ -99,7 +115,6 @@ spec:
                 }
               }
               
-              // Export traces directly to Tempo
               otelcol.exporter.otlp "tempo" {
                 client {
                   endpoint = "tempo.tempo.svc.cluster.local:4317"
@@ -110,7 +125,6 @@ spec:
                 }
               }
 
-              // Translate OpenTelemetry metrics to Prometheus format for VictoriaMetrics
               otelcol.exporter.prometheus "to_victoriametrics" {
                 forward_to = [prometheus.remote_write.victoriametrics.receiver]
               }
