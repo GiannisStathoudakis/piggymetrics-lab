@@ -14,12 +14,10 @@ spec:
     helm:
       values: |
         controller:
-          type: daemonset
+          type: deployment
+          replicas: 1
 
         alloy:
-          mounts:
-            varlog: true
-
           configMap:
             content: |-
               // ==========================================
@@ -57,10 +55,6 @@ spec:
               
               discovery.kubernetes "pods" {
                 role = "pod"
-                selectors {
-                  role  = "pod"
-                  field = "spec.nodeName=" + sys.env("HOSTNAME")
-                }
               }
               
               discovery.relabel "pod_logs" {
@@ -77,22 +71,10 @@ spec:
                   source_labels = ["__meta_kubernetes_pod_container_name"]
                   target_label  = "container"
                 }
-                rule {
-                  source_labels = ["__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
-                  target_label  = "__path__"
-                  separator     = "/"
-                  replacement   = "/var/log/pods/*$1/*.log"
-                }
               }
               
-              // Match the generated K8s metadata paths to the physical files on disk
-              local.file_match "pod_logs" {
-                path_targets = discovery.relabel.pod_logs.output
-              }
-              
-              // Read the files and push to Loki
-              loki.source.file "cluster_logs" {
-                targets    = local.file_match.pod_logs.targets
+              loki.source.kubernetes "cluster_logs" {
+                targets    = discovery.relabel.pod_logs.output
                 forward_to = [loki.write.loki.receiver]
               }
               
