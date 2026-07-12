@@ -23,6 +23,9 @@ spec:
         loki:
           auth_enabled: false
           
+          commonConfig:
+            replication_factor: 1
+            
           schemaConfig:
             configs:
               - from: "2026-01-01"

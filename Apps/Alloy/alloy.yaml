@@ -14,23 +14,29 @@ spec:
     helm:
       values: |
         controller:
-          type: deployment
-          replicas: 1
+          type: daemonset
 
         alloy:
-          rbac:
-            create: true
-          extraClusterRoleRules:
-            - apiGroups: [""]
-              resources: ["pods", "pods/log"]
-              verbs: ["get", "list", "watch"]
+          extraVolumes:
+            - name: varlogpods
+              hostPath:
+                path: /var/log/pods
+            - name: varlogcontainers
+              hostPath:
+                path: /var/log/containers
+          extraVolumeMounts:
+            - name: varlogpods
+              mountPath: /var/log/pods
+              readOnly: true
+            - name: varlogcontainers
+              mountPath: /var/log/containers
+              readOnly: true
               
           configMap:
             content: |-
               // ==========================================
               // VictoriaMetrics
               // ==========================================
-              
               discovery.kubernetes "endpoints" {
                 role = "endpoints"
               }
@@ -59,13 +65,20 @@ spec:
               // ==========================================
               // Loki
               // ==========================================
-              
               discovery.kubernetes "pods" {
                 role = "pod"
               }
               
               discovery.relabel "pod_logs" {
-                targets = discovery.kubernetes.pods.targets
+                targets = discovery.kubernetes.pods.targets               
+                rule {
+                  source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_name", "__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
+                  separator     = "/"
+                  action        = "replace"
+                  replacement   = "/var/log/pods/$1_$2_$3/$4/*.log"
+                  target_label  = "__path__"
+                }
+                
                 rule {
                   source_labels = ["__meta_kubernetes_namespace"]
                   target_label  = "namespace"
@@ -80,8 +93,12 @@ spec:
                 }
               }
               
-              loki.source.kubernetes "cluster_logs" {
-                targets    = discovery.relabel.pod_logs.output
+              local.file_match "pod_logs" {
+                path_targets = discovery.relabel.pod_logs.output
+              }
+              
+              loki.source.file "pod_logs" {
+                targets    = local.file_match.pod_logs.targets
                 forward_to = [loki.write.loki.receiver]
               }
               
@@ -94,7 +111,6 @@ spec:
               // ==========================================
               // Tempo & VictoriaMetrics
               // ==========================================
-              
               otelcol.receiver.otlp "default" {
                 grpc { endpoint = "0.0.0.0:4317" }
                 http { endpoint = "0.0.0.0:4318" }
