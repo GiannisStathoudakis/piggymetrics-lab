@@ -46,16 +46,14 @@ spec:
               s3ForcePathStyle: true
         
         gateway:
-          basicAuth:
-            enabled: false
-
-        gateway:
           enabled: false
 
         singleBinary:
           replicas: 1
           persistence:
-            enabled: false
+            enabled: true
+            size: 5Gi
+            storageClass: longhorn
 
         read:
           replicas: 0
