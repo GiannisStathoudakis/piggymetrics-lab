@@ -14,30 +14,16 @@ spec:
     helm:
       values: |
         controller:
-          type: daemonset
+          type: deployment
+          replicas: 1
 
         alloy:
-          securityContext:
-            runAsUser: 0
-            runAsGroup: 0
-            
           rbac:
             create: true
-
-          extraVolumes:
-            - name: varlogpods
-              hostPath:
-                path: /var/log/pods
-            - name: varlogcontainers
-              hostPath:
-                path: /var/log/containers
-          extraVolumeMounts:
-            - name: varlogpods
-              mountPath: /var/log/pods
-              readOnly: true
-            - name: varlogcontainers
-              mountPath: /var/log/containers
-              readOnly: true
+          extraClusterRoleRules:
+            - apiGroups: [""]
+              resources: ["pods", "pods/log"]
+              verbs: ["get", "list", "watch"]
               
           configMap:
             content: |-
@@ -78,14 +64,6 @@ spec:
               
               discovery.relabel "pod_logs" {
                 targets = discovery.kubernetes.pods.targets                
-                rule {
-                  source_labels = ["__meta_kubernetes_namespace", "__meta_kubernetes_pod_name", "__meta_kubernetes_pod_uid", "__meta_kubernetes_pod_container_name"]
-                  separator     = "/"
-                  action        = "replace"
-                  regex         = "(.*)/(.*)/(.*)/(.*)"
-                  replacement   = "/var/log/pods/$1_$2_$3/$4/*.log"
-                  target_label  = "__path__"
-                }
                 
                 rule {
                   source_labels = ["__meta_kubernetes_namespace"]
@@ -101,12 +79,8 @@ spec:
                 }
               }
               
-              local.file_match "pod_logs" {
-                path_targets = discovery.relabel.pod_logs.output
-              }
-              
-              loki.source.file "pod_logs" {
-                targets    = local.file_match.pod_logs.targets
+              loki.source.kubernetes "pod_logs" {
+                targets    = discovery.relabel.pod_logs.output
                 forward_to = [loki.write.loki.receiver]
               }
               
