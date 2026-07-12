@@ -18,6 +18,13 @@ spec:
           replicas: 1
 
         alloy:
+          rbac:
+            create: true
+          extraClusterRoleRules:
+            - apiGroups: [""]
+              resources: ["pods", "pods/log"]
+              verbs: ["get", "list", "watch"]
+              
           configMap:
             content: |-
               // ==========================================
