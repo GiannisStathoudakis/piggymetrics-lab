@@ -26,6 +26,7 @@
 <h3>3. Networking & Edge Gateway</h3>
 <ul>
   <li><b>Cilium & Hubble:</b> Provides eBPF-based CNI networking, replaces traditional load balancers with L2 announcements, secures node-to-node traffic via WireGuard encryption, and provides real-time network visibility using Hubble.</li>
+  <li><b>Kubernetes Gateway API:</b> Manages North-South ingress routing and TLS termination natively using Cilium's Gateway API controller (custom <code>Gateway</code> and <code>HTTPRoute</code> resources) for eBPF-accelerated Layer 7 traffic management.</li>
 </ul>
 
 <h3>4. Zero-Trust Security & Identity</h3>
