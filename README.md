@@ -17,10 +17,10 @@
 
 <h3>2. CI/CD & Package Management</h3>
 <ul>
-  <li><b>GitHub Actions:</b> Automatically builds container images for the PiggyMetrics microservices whenever changes are pushed to the repository.</li>
+  <li><b>GitHub Actions:</b> Configured directly in the <a href="https://github.com/GiannisStathoudakis/piggymetrics-fork">app fork repository</a> to automatically build container images for the microservices whenever source code changes are pushed.</li>
   <li><b>GitHub Packages (GHCR):</b> Serves as the central container registry storing all built images.</li>
-  <li><b>Custom Helm Charts:</b> Used to package and parameterize the PiggyMetrics deployments, configurations, and environment overrides for clean, modular management.</li>
-  <li><b>Argo CD:</b> Implements GitOps by continuously monitoring this repository and automatically synchronizing state changes to the RKE2 cluster.</li>
+  <li><b>Custom Helm Charts:</b> Stored alongside the application code in the fork repository. They are used to package and parameterize the PiggyMetrics deployments, configurations, and environment overrides for clean, modular management.</li>
+  <li><b>Argo CD:</b> Implements GitOps by continuously monitoring the Helm charts and manifests, automatically synchronizing state changes to the RKE2 cluster.</li>
 </ul>
 
 <h3>3. Networking & Edge Gateway</h3>
