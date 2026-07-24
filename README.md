@@ -1,14 +1,55 @@
-PiggyMetrics Lab (Under Construction 🚧)
+<h1>PiggyMetrics Lab</h1>
 
-This is my personal playground for learning how microservices actually work.
+<p>This repository serves as a practical learning environment for deploying and managing microservices, GitOps, and zero-trust infrastructure.</p>
 
-I chose PiggyMetrics https://github.com/sqshq/piggymetrics as my test subject because it has a lot of moving parts—multiple Java services, databases, and message queues—making it perfect for practicing.
+<p>The lab utilizes a fork (<a href="https://github.com/GiannisStathoudakis/piggymetrics-fork">piggymetrics-fork</a>) of <a href="https://github.com/sqshq/piggymetrics">PiggyMetrics</a>, which has been modified and adapted to be as compatible as possible with this infrastructure project. It acts as a comprehensive microservices application featuring multiple Java Spring Boot services and MongoDB instances.</p>
 
-Tools I'm Using (And Why)
-To keep this lab self-hosted and highly visual, I am setting up the following tools on a local virtual machine:
-- The Base (RKE2)
-- Networking & Traffic (Cilium & Hubble): Handles all the communication between services. It replaces older tools like MetalLB for local load balancing and lets me see real-time traffic maps using Hubble.
-- Automated Deployments (Argo CD): It watches this repository and automatically updates the apps in the cluster whenever I push a change.
-- Security & Passwords (Vault, ESO, Cert-Manager): Instead of hardcoding passwords in plain text, I use HashiCorp Vault to hide them. The External Secrets Operator (ESO) securely hands them to Kubernetes, and Cert-Manager sets up HTTPS.
-- Logs & Monitoring (Grafana Alloy + LGTM Stack + VictoriaMetrics): Grafana Alloy collects all the data from the cluster. It maps everything into Loki (logs), Tempo (traces), and VictoriaMetrics (metrics) so I can visually track exactly what the apps are doing on Grafana dashboards.
-- Storage & Backups (Longhorn + Garage): Longhorn manages disk storage for the databases. I am using Garage (a tiny, fast tool written in Rust) to mimic an AWS S3 bucket so I can practice backing up my data locally.
+<hr>
+
+<h2>Architecture & Tooling</h2>
+
+<p>To keep this lab fully self-hosted, modular, and highly observable, the infrastructure is built on a local Virtual Machine using the following stack:</p>
+
+<h3>1. Compute & Kubernetes Base</h3>
+<ul>
+  <li><b>RKE2 (Rancher Kubernetes Engine 2):</b> A lightweight, security-focused Kubernetes distribution serving as the core container orchestrator.</li>
+</ul>
+
+<h3>2. CI/CD & Package Management</h3>
+<ul>
+  <li><b>GitHub Actions:</b> Automatically builds container images for the PiggyMetrics microservices whenever changes are pushed to the repository.</li>
+  <li><b>GitHub Packages (GHCR):</b> Serves as the central container registry storing all built images.</li>
+  <li><b>Custom Helm Charts:</b> Used to package and parameterize the PiggyMetrics deployments, configurations, and environment overrides for clean, modular management.</li>
+  <li><b>Argo CD:</b> Implements GitOps by continuously monitoring this repository and automatically synchronizing state changes to the RKE2 cluster.</li>
+</ul>
+
+<h3>3. Networking & Edge Gateway</h3>
+<ul>
+  <li><b>Cilium & Hubble:</b> Provides eBPF-based CNI networking, replaces traditional load balancers with L2 announcements, secures node-to-node traffic via WireGuard encryption, and provides real-time network visibility using Hubble.</li>
+</ul>
+
+<h3>4. Zero-Trust Security & Identity</h3>
+<ul>
+  <li><b>HashiCorp Vault:</b> Acts as the centralized secret engine and CA authority, generating dynamic database credentials on demand instead of storing static secrets.</li>
+  <li><b>External Secrets Operator (ESO):</b> Bridge between Vault and Kubernetes, automatically syncing ephemeral database credentials into Kubernetes Secrets.</li>
+  <li><b>Cert-Manager:</b> Automates TLS certificate issuance and renewal using Vault as the ClusterIssuer.</li>
+</ul>
+
+<h3>5. Observability & Telemetry</h3>
+<ul>
+  <li><b>Grafana Alloy:</b> Collects logs, metrics, and traces across all microservices and cluster nodes.</li>
+  <li><b>LGTM Stack + VictoriaMetrics:</b>
+    <ul>
+      <li><b>Loki:</b> Centralized log aggregation.</li>
+      <li><b>Tempo:</b> Distributed tracing across Spring Boot services via OpenTelemetry.</li>
+      <li><b>VictoriaMetrics:</b> High-performance metric storage.</li>
+      <li><b>Grafana:</b> Unified dashboards for real-time visualization of cluster health and application flow.</li>
+    </ul>
+  </li>
+</ul>
+
+<h3>6. Storage & Backups</h3>
+<ul>
+  <li><b>Longhorn:</b> Provides persistent block storage for stateful workloads like MongoDB.</li>
+  <li><b>Garage S3:</b> A lightweight S3-compatible object store written in Rust, used to emulate AWS S3 for local database backups.</li>
+</ul>
