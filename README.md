@@ -51,5 +51,5 @@
 <h3>6. Storage & Backups</h3>
 <ul>
   <li><b>Longhorn:</b> Provides persistent block storage for stateful workloads like MongoDB.</li>
-  <li><b>Garage S3:</b> A lightweight S3-compatible object store written in Rust, used to emulate AWS S3 for local database backups.</li>
+  <li><b>Garage S3:</b> A lightweight S3-compatible object store written in Rust, used to emulate AWS S3 for local logs backups.</li>
 </ul>
