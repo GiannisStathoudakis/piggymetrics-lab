@@ -1,0 +1,61 @@
+---
+- hosts: master
+  become: true
+  vars_files:
+    - files/cluster-keys.json
+  
+  vars:
+    kubectl_cmd: "/var/lib/rancher/rke2/bin/kubectl --kubeconfig /etc/rancher/rke2/rke2.yaml"
+    microservices:
+      - account-service
+      - auth-service
+      - config
+      - gateway
+      - notification-service
+      - registry
+      - statistics-service
+
+  tasks: 
+    - name: 01. Enable Database Secrets Engine in Vault
+      ansible.builtin.shell: >
+        {{ kubectl_cmd }} exec -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; 
+        vault secrets enable database"
+      environment:
+        VAULT_TOKEN: "{{ root_token }}"
+      register: enable_db
+      failed_when: "enable_db.rc != 0 and 'path is already in use' not in enable_db.stderr"
+      changed_when: "enable_db.rc == 0"
+
+    - name: 02. Configure MongoDB connection in Vault
+      ansible.builtin.shell: >
+        {{ kubectl_cmd }} exec -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; 
+        vault write database/config/piggymetrics-mongodb 
+        plugin_name=mongodb-database-plugin 
+        allowed_roles='*' 
+        connection_url='mongodb://{% raw %}{{username}}:{{password}}{% endraw %}@mongodb.piggymetrics.svc.cluster.local:27017/admin?tls=false' 
+        username='vault-admin' 
+        password='vault-root-password-123'"
+      environment:
+        VAULT_TOKEN: "{{ root_token }}"
+      changed_when: false
+
+    - name: 03. Create Vault roles for microservices
+      ansible.builtin.shell: >
+        {{ kubectl_cmd }} exec -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; 
+        vault write database/roles/{{ item }}-role 
+        db_name=piggymetrics-mongodb 
+        creation_statements='{\"db\": \"piggymetrics\", \"roles\": [{\"role\": \"readWrite\"}]}' 
+        default_ttl='1h' 
+        max_ttl='24h'"
+      environment:
+        VAULT_TOKEN: "{{ root_token }}"
+      loop: "{{ microservices }}"
+      changed_when: false
+
+    - name: 04. Grant ESO API permissions for Database Creds
+      ansible.builtin.shell: >
+        {{ kubectl_cmd }} exec -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; 
+        echo 'path \"secret/data/*\" { capabilities = [\"read\"] } path \"database/creds/*\" { capabilities = [\"read\"] }' | vault policy write eso-policy -"
+      environment:
+        VAULT_TOKEN: "{{ root_token }}"
+      changed_when: true

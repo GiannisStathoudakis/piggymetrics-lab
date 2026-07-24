@@ -1,0 +1,7 @@
+---
+- hosts: master
+  tasks:
+    - name: 01. Bootstrap the Cluster (Apply ApplicationSet)
+      kubernetes.core.k8s:
+        state: present
+        src: "https://raw.githubusercontent.com/GiannisStathoudakis/piggymetrics-lab/master/Bootstrap/piggy-metrics-root.yaml?v=3"
