@@ -90,7 +90,6 @@ spec:
     - name: grafana
       port: 80
 ---
----
 # -----------------------------
 # Garage S3 Routing
 # -----------------------------
@@ -110,3 +109,21 @@ spec:
   - backendRefs:
     - name: garage
       port: 3900
+---
+# -----------------------------
+# RedPanda Console Routing
+# -----------------------------
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: redpanda-console-route
+  namespace: redpanda
+spec:
+  parentRefs:
+  - name: lab-gateway
+    namespace: gateway
+  hostnames: ["redpanda.lab.internal"]
+  rules:
+  - backendRefs:
+    - name: redpanda-console
+      port: 8080

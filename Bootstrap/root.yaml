@@ -33,6 +33,8 @@ spec:
             path: Apps/Tempo
           - app: alloy
             path: Apps/Alloy
+          - app: redpanda
+            path: Apps/RedPanda
 
   template:
     metadata:
