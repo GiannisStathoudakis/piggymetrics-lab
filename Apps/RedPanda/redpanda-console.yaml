@@ -14,7 +14,7 @@ spec:
         config:
           kafka:
             brokers:
-              - redpanda.redpanda.svc.cluster.local:9092
+              - redpanda.redpanda.svc.cluster.local:9093
               
         resources:
           limits:
