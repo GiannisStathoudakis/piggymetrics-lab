@@ -29,6 +29,7 @@ spec:
             
         storage:
           persistentVolume:
+            enabled: true
             storageClass: "longhorn"
             size: 10Gi
             
