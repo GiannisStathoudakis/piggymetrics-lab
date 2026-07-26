@@ -1,17 +1,17 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: piggymetrics
+  name: ecommerce
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: 'https://github.com/GiannisStathoudakis/piggymetrics-fork.git'
+    repoURL: 'https://github.com/GiannisStathoudakis/springboot-kafka-streams-microservices-demo.git'
     targetRevision: HEAD
     path: chart
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: piggymetrics
+    namespace: ecommerce
   syncPolicy:
     automated:
       prune: true
