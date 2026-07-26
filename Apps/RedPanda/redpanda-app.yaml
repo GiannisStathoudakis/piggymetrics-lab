@@ -30,7 +30,7 @@ spec:
         storage:
           persistentVolume:
             enabled: true
-            storageClass: "longhorn"
+            storageClass: longhorn
             size: 10Gi
             
         tuning:
