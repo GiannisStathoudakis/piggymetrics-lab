@@ -29,7 +29,7 @@ spec:
             
         storage:
           persistentVolume:
-            storageClass: "local-path"
+            storageClass: "loghorn"
             size: 10Gi
             
         tuning:
