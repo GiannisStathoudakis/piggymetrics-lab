@@ -35,8 +35,8 @@ spec:
             path: Apps/Alloy
           - app: redpanda
             path: Apps/RedPanda
-          #- app: mysql
-          #  path: Apps/MySql
+          - app: mysql
+            path: Apps/MySql
 
   template:
     metadata:
