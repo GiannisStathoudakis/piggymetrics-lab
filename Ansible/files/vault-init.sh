@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e # Stop execution if any command fails!
 
 echo "Initializing Vault..."
 
@@ -21,7 +20,7 @@ vault login $VAULT_ROOT_TOKEN
 
 #Setup Root CA
 echo "Configuring Root CA..."
-vault secrets enable pki || true # || true ignores errors if already enabled
+vault secrets enable pki || true
 vault secrets tune -max-lease-ttl=87600h pki
 vault write -field=certificate pki/root/generate/internal common_name="Lab Root CA" ttl=87600h > /tmp/Lab_Root_CA.crt
 
