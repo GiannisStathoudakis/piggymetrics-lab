@@ -1,56 +1,45 @@
-<h1>PiggyMetrics Lab</h1>
+# Spring Boot & Kafka Streams Microservices Lab
 
-<p>This repository serves as a practical learning environment for deploying and managing microservices, GitOps, and zero-trust infrastructure.</p>
+This repository serves as a practical learning environment for deploying and managing event-driven microservices, GitOps, and zero-trust infrastructure.
 
-<p>The lab utilizes a fork (<a href="https://github.com/GiannisStathoudakis/piggymetrics-fork">piggymetrics-fork</a>) of <a href="https://github.com/sqshq/piggymetrics">PiggyMetrics</a>, which has been modified and adapted to be as compatible as possible with this infrastructure project. It acts as a comprehensive microservices application featuring multiple Java Spring Boot services and MongoDB instances.</p>
+The lab utilizes a fork ([microservices-demo-fork](https://github.com/GiannisStathoudakis/springboot-kafka-streams-microservices-demo)) of [ZaTribune's Spring Boot Kafka Streams Demo](https://github.com/ZaTribune/springboot-kafka-streams-microservices-demo), which has been modified and adapted to be as compatible as possible with this infrastructure project. It acts as a comprehensive e-commerce microservices application featuring multiple Java Spring Boot services, MySQL databases, and real-time event streams.
 
-<hr>
+---
 
-<h2>Architecture & Tooling</h2>
+## Architecture & Tooling
 
-<p>To keep this lab fully self-hosted, modular, and highly observable, the infrastructure is built across a <b>2-node local Virtual Machine cluster</b> using the following stack:</p>
+To keep this lab fully self-hosted, modular, and highly observable, the infrastructure is built across a **2-node local Virtual Machine cluster** using the following stack:
 
-<h3>1. Compute & Kubernetes Base</h3>
-<ul>
-  <li><b>RKE2 (Rancher Kubernetes Engine 2):</b> A lightweight, security-focused Kubernetes distribution serving as the core container orchestrator across the two VMs.</li>
-</ul>
+### 1. Compute & Kubernetes Base
+* **RKE2 (Rancher Kubernetes Engine 2):** A lightweight, security-focused Kubernetes distribution serving as the core container orchestrator across the two VMs.
 
-<h3>2. CI/CD & Package Management</h3>
-<ul>
-  <li><b>GitHub Actions:</b> Configured directly in the <a href="https://github.com/GiannisStathoudakis/piggymetrics-fork">app fork repository</a> to automatically build container images for the microservices whenever source code changes are pushed.</li>
-  <li><b>GitHub Packages (GHCR):</b> Serves as the central container registry storing all built images.</li>
-  <li><b>Custom Helm Charts:</b> Stored alongside the application code in the fork repository. They are used to package and parameterize the PiggyMetrics deployments, configurations, and environment overrides for clean, modular management.</li>
-  <li><b>Argo CD:</b> Implements GitOps by continuously monitoring the Helm charts and manifests, automatically synchronizing state changes to the RKE2 cluster.</li>
-</ul>
+### 2. CI/CD & Package Management
+* **GitHub Actions:** Configured directly in the [app fork repository](https://github.com/GiannisStathoudakis/springboot-kafka-streams-microservices-demo) to automatically build container images for the microservices whenever source code changes are pushed.
+* **GitHub Packages (GHCR):** Serves as the central container registry storing all built images.
+* **Custom Helm Charts:** Stored alongside the application code in the fork repository. They are used to package and parameterize the microservice deployments, configurations, and environment overrides for clean, modular management.
+* **Argo CD:** Implements GitOps by continuously monitoring the Helm charts and manifests, automatically synchronizing state changes to the RKE2 cluster.
 
-<h3>3. Networking & Edge Gateway</h3>
-<ul>
-  <li><b>Cilium & Hubble:</b> Provides eBPF-based CNI networking, replaces traditional load balancers with L2 announcements, secures node-to-node traffic via WireGuard encryption, and provides real-time network visibility using Hubble.</li>
-  <li><b>Kubernetes Gateway API:</b> Manages North-South ingress routing and TLS termination natively using Cilium's Gateway API controller (<code>Gateway</code> and <code>HTTPRoute</code>).</li>
-</ul>
+### 3. Networking & Edge Gateway
+* **Cilium & Hubble:** Provides eBPF-based CNI networking, replaces traditional load balancers with L2 announcements, secures node-to-node traffic via WireGuard encryption, and provides real-time network visibility using Hubble.
+* **Kubernetes Gateway API:** Manages North-South ingress routing and TLS termination natively using Cilium's Gateway API controller (`Gateway` and `HTTPRoute`).
 
-<h3>4. Zero-Trust Security & Identity</h3>
-<ul>
-  <li><b>HashiCorp Vault:</b> Acts as the centralized secret engine and CA authority, generating dynamic database credentials on demand instead of storing static secrets.</li>
-  <li><b>External Secrets Operator (ESO):</b> Bridge between Vault and Kubernetes, automatically syncing ephemeral database credentials into Kubernetes Secrets.</li>
-  <li><b>Cert-Manager:</b> Automates TLS certificate issuance and renewal using Vault as the ClusterIssuer.</li>
-</ul>
+### 4. Zero-Trust Security & Dynamic Credentials
+* **HashiCorp Vault:** Acts as the centralized secret engine and CA authority. Instead of storing static database passwords, Vault dynamically generates short-lived, ephemeral MySQL credentials on demand, utilizing modern `caching_sha2_password` authentication.
+* **External Secrets Operator (ESO):** Acts as the bridge between Vault and Kubernetes, automatically fetching and mapping these dynamic credentials into Kubernetes Secrets (utilizing single-call `dataFrom` templates to ensure perfect credential pairing).
+* **Cert-Manager:** Automates TLS certificate issuance and renewal using Vault as the ClusterIssuer.
 
-<h3>5. Observability & Telemetry</h3>
-<ul>
-  <li><b>Grafana Alloy:</b> Collects logs, metrics, and traces across all microservices and cluster nodes.</li>
-  <li><b>LGTM Stack + VictoriaMetrics:</b>
-    <ul>
-      <li><b>Loki:</b> Centralized log aggregation.</li>
-      <li><b>Tempo:</b> Distributed tracing across Spring Boot services via OpenTelemetry.</li>
-      <li><b>VictoriaMetrics:</b> High-performance metric storage.</li>
-      <li><b>Grafana:</b> Unified dashboards for real-time visualization of cluster health and application flow.</li>
-    </ul>
-  </li>
-</ul>
+### 5. Messaging & Data State
+* **Redpanda:** A lightweight, highly performant, C++ based drop-in alternative to Apache Kafka. It eliminates the need for ZooKeeper and JVM overhead while serving as the event-streaming backbone for the Spring Boot Kafka Streams topologies (Orders, Payments, Stock).
+* **MySQL 8.0+:** Serves as the relational database backend for the microservices, populated securely and dynamically via Vault.
 
-<h3>6. Storage & Backups</h3>
-<ul>
-  <li><b>Longhorn:</b> Provides persistent block storage for stateful workloads like MongoDB.</li>
-  <li><b>Garage S3:</b> A lightweight S3-compatible object store written in Rust, used to emulate AWS S3 for local logs backups.</li>
-</ul>
+### 6. Observability & Telemetry
+* **Grafana Alloy:** Collects logs, metrics, and traces across all microservices and cluster nodes.
+* **LGTM Stack + VictoriaMetrics:**
+  * **Loki:** Centralized log aggregation.
+  * **Tempo:** Distributed tracing across Spring Boot services via OpenTelemetry.
+  * **VictoriaMetrics:** High-performance metric storage.
+  * **Grafana:** Unified dashboards for real-time visualization of cluster health and application flow.
+
+### 7. Storage & Backups
+* **Longhorn:** Provides persistent block storage for stateful workloads like MySQL and Redpanda.
+* **Garage S3:** A lightweight S3-compatible object store written in Rust, used to emulate AWS S3 for local logs and backups.
