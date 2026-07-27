@@ -61,3 +61,8 @@
       environment:
         VAULT_TOKEN: "{{ root_token }}"
       changed_when: true
+    
+    - name: 05. Initialize Redpanda Kafka Topics
+      ansible.builtin.shell: >
+        {{ kubectl_cmd }} exec -n redpanda redpanda-0 -- rpk topic create orders payments stock --partitions 3 --replicas 1 || true
+      changed_when: false
