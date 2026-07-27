@@ -21,7 +21,10 @@ spec:
         image: mysql:8.0
         env:
         - name: MYSQL_ROOT_PASSWORD
-          value: "password" #it will be changed later with ansible 
+          valueFrom:
+            secretKeyRef:
+              name: myql-admin-credentials
+              key: admin-password
         - name: MYSQL_DATABASE
           value: "ecommerce"
         
