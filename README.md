@@ -1,5 +1,7 @@
 # Spring Boot & Kafka Streams Microservices Lab
 
+> **Note on Repository Name:** This repository is named `piggymetrics-lab` because it originally hosted a [PiggyMetrics](https://github.com/sqshq/piggymetrics) deployment. The lab has since been heavily upgraded to use the Spring Boot Kafka Streams Demo. The repository name has been kept intact to prevent breaking existing GitOps continuous deployment pipelines in Argo CD.
+
 This repository serves as a practical learning environment for deploying and managing event-driven microservices, GitOps, and zero-trust infrastructure.
 
 The lab utilizes a fork ([microservices-demo-fork](https://github.com/GiannisStathoudakis/springboot-kafka-streams-microservices-demo)) of [ZaTribune's Spring Boot Kafka Streams Demo](https://github.com/ZaTribune/springboot-kafka-streams-microservices-demo), which has been modified and adapted to be as compatible as possible with this infrastructure project. It acts as a comprehensive e-commerce microservices application featuring multiple Java Spring Boot services, MySQL databases, and real-time event streams.
