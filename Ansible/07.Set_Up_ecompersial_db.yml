@@ -15,12 +15,10 @@
     - name: 01. Enable Database Secrets Engine in Vault
       ansible.builtin.shell: >
         {{ kubectl_cmd }} exec -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; 
-        vault secrets enable database"
+        vault secrets enable -path=database database || true"
       environment:
         VAULT_TOKEN: "{{ root_token }}"
-      register: enable_db
-      failed_when: "enable_db.rc != 0 and 'path is already in use' not in enable_db.stderr"
-      changed_when: "enable_db.rc == 0"
+      changed_when: false
 
     - name: 02. Configure MySQL connection in Vault
       ansible.builtin.shell: >
@@ -28,35 +26,35 @@
         vault write database/config/ecommerce-mysql 
         plugin_name=mysql-database-plugin 
         allowed_roles='*' 
-        connection_url='{% raw %}{{username}}:{{password}}{% endraw %}@tcp(mysql.ecommerce.svc.cluster.local:3306)/' 
+        connection_url='{% raw %}{{username}}:{{password}}{% endraw %}@tcp(mysql.ecommerce.svc.cluster.local:3306)/?multiStatements=true' 
         username='root' 
         password='password'"
       environment:
         VAULT_TOKEN: "{{ root_token }}"
-      changed_when: false
+      changed_when: true
 
-    - name: 03. Rotate the MySQL Root Password
-      ansible.builtin.shell: >
-        {{ kubectl_cmd }} exec -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; 
-        vault write -force database/rotate-root/ecommerce-mysql"
-      environment:
-        VAULT_TOKEN: "{{ root_token }}"
-      ignore_errors: true
-
-    - name: 04. Create Vault roles for microservices (MySQL Syntax)
-      ansible.builtin.shell: >
-        {{ kubectl_cmd }} exec -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; 
-        vault write database/roles/{{ item }}-role 
-        db_name=ecommerce-mysql 
-        creation_statements=\"CREATE USER '{% raw %}{{name}}{% endraw %}'@'%' IDENTIFIED BY '{% raw %}{{password}}{% endraw %}'; GRANT ALL PRIVILEGES ON ecommerce.* TO '{% raw %}{{name}}{% endraw %}'@'%';\" 
-        default_ttl='1h' 
-        max_ttl='24h'"
+    - name: 03. Create Vault roles for microservices (Modern Auth & No-Op Revocation)
+      ansible.builtin.shell: |
+        cat << 'EOF' | {{ kubectl_cmd }} exec -i -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; vault write database/roles/{{ item }}-role - "
+        {
+          "db_name": "ecommerce-mysql",
+          "creation_statements": [
+            "CREATE USER '{% raw %}{{name}}{% endraw %}'@'%' IDENTIFIED WITH caching_sha2_password BY '{% raw %}{{password}}{% endraw %}';",
+            "GRANT ALL PRIVILEGES ON ecommerce.* TO '{% raw %}{{name}}{% endraw %}'@'%';"
+          ],
+          "revocation_statements": [
+            "SELECT 1;"
+          ],
+          "default_ttl": "24h",
+          "max_ttl": "24h"
+        }
+        EOF
       environment:
         VAULT_TOKEN: "{{ root_token }}"
       loop: "{{ microservices }}"
-      changed_when: false
+      changed_when: true
 
-    - name: 05. Grant ESO API permissions for Database Creds
+    - name: 04. Grant ESO API permissions for Database Creds
       ansible.builtin.shell: >
         {{ kubectl_cmd }} exec -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; 
         echo 'path \"secret/data/*\" { capabilities = [\"read\"] } path \"database/creds/*\" { capabilities = [\"read\"] }' | vault policy write eso-policy -"
