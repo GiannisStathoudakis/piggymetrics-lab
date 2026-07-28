@@ -13,5 +13,5 @@ spec:
   data:
   - secretKey: admin-password
     remoteRef:
-      key: secret/myql
+      key: secret/mysql
       property: admin-password
