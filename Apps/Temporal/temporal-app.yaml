@@ -15,19 +15,7 @@ spec:
       valuesObject:
         server:
           replicaCount: 1
-          
-          additionalEnv:
-            - name: TEMPORAL_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  name: temporal-db-secret
-                  key: TEMPORAL_USERNAME
-            - name: TEMPORAL_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: temporal-db-secret
-                  key: TEMPORAL_PASSWORD
-                  
+                            
           config:
             persistence:
               defaultStore: default
@@ -42,8 +30,9 @@ spec:
                     databaseName: "temporal"
                     connectAddr: "mysql.ecommerce.svc.cluster.local:3306"
                     connectProtocol: "tcp"
-                    user: "${TEMPORAL_USERNAME}"
-                    password: "${TEMPORAL_PASSWORD}"
+                    user: "temporal"
+                    existingSecret: "temporal-db-secret" 
+                    secretKey: "password"
                 visibility:
                   sql:
                     createDatabase: false
@@ -53,8 +42,9 @@ spec:
                     databaseName: "temporal_visibility"
                     connectAddr: "mysql.ecommerce.svc.cluster.local:3306"
                     connectProtocol: "tcp"
-                    user: "${TEMPORAL_USERNAME}"
-                    password: "${TEMPORAL_PASSWORD}"
+                    user: "temporal"
+                    existingSecret: "temporal-db-secret"
+                    secretKey: "password"
         web:
           enabled: true
   destination:

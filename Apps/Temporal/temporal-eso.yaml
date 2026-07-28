@@ -6,15 +6,12 @@ metadata:
 spec:
   refreshInterval: "1h"
   secretStoreRef:
-    name: vault-db-backend
+    name: vault-backend
     kind: ClusterSecretStore
   target:
     name: temporal-db-secret
-    creationPolicy: Owner
-    template:
-      data:
-        TEMPORAL_USERNAME: '{{ "{{" }} .username {{ "}}" }}'
-        TEMPORAL_PASSWORD: '{{ "{{" }} .password {{ "}}" }}'
-  dataFrom:
-  - extract:
-      key: database/creds/temporal-role
+  data:
+  - secretKey: password
+    remoteRef:
+      key: secret/temporal
+      property: temporal_pass
