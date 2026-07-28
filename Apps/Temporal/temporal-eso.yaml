@@ -1,0 +1,20 @@
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+metadata:
+  name: temporal-db-credentials
+  namespace: ecommerce
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: vault-db-backend
+    kind: ClusterSecretStore
+  target:
+    name: temporal-db-secret
+    creationPolicy: Owner
+    template:
+      data:
+        TEMPORAL_USERNAME: '{{ "{{" }} .username {{ "}}" }}'
+        TEMPORAL_PASSWORD: '{{ "{{" }} .password {{ "}}" }}'
+  dataFrom:
+  - extract:
+      key: database/creds/temporal-role

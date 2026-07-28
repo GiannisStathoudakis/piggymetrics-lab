@@ -15,36 +15,46 @@ spec:
       valuesObject:
         server:
           replicaCount: 1
+          
+          additionalEnv:
+            - name: TEMPORAL_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: temporal-db-secret
+                  key: TEMPORAL_USERNAME
+            - name: TEMPORAL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: temporal-db-secret
+                  key: TEMPORAL_PASSWORD
+                  
           config:
             persistence:
               defaultStore: default
               visibilityStore: visibility
-              
               datastores:
                 default:
                   sql:
-                    createDatabase: true
+                    createDatabase: false
                     manageSchema: true
                     pluginName: "mysql8"
                     driverName: "mysql8"
                     databaseName: "temporal"
                     connectAddr: "mysql.ecommerce.svc.cluster.local:3306"
                     connectProtocol: "tcp"
-                    user: "root"
-                    existingSecret: "mysql-admin-credentials"
-                    secretKey: "admin-password"
+                    user: "${TEMPORAL_USERNAME}"
+                    password: "${TEMPORAL_PASSWORD}"
                 visibility:
                   sql:
-                    createDatabase: true
+                    createDatabase: false
                     manageSchema: true
                     pluginName: "mysql8"
                     driverName: "mysql8"
                     databaseName: "temporal_visibility"
                     connectAddr: "mysql.ecommerce.svc.cluster.local:3306"
                     connectProtocol: "tcp"
-                    user: "root"
-                    existingSecret: "mysql-admin-credentials"
-                    secretKey: "admin-password"
+                    user: "${TEMPORAL_USERNAME}"
+                    password: "${TEMPORAL_PASSWORD}"
         web:
           enabled: true
   destination:
