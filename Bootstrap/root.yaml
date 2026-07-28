@@ -37,8 +37,8 @@ spec:
             path: Apps/RedPanda
           - app: mysql
             path: Apps/MySql
-          #- app: temporal
-          #  path: Apps/Temporal
+          - app: temporal
+            path: Apps/Temporal
 
   template:
     metadata:
