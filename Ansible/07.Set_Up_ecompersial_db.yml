@@ -32,7 +32,7 @@
     - name: 03. Fetch Temporal password from Vault KV
       ansible.builtin.shell: >
         {{ kubectl_cmd }} exec -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; 
-        vault kv get -field=temporal_pass secret/temporal" # <-- Updated to match Vault exactly!
+        vault kv get -field=temporal_pass secret/temporal"
       environment:
         VAULT_TOKEN: "{{ root_token }}"
       register: temporal_pass
