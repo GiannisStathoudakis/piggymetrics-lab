@@ -23,7 +23,7 @@ spec:
         - name: MYSQL_ROOT_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: myql-admin-credentials
+              name: mysql-admin-credentials
               key: admin-password
         - name: MYSQL_DATABASE
           value: "ecommerce"
