@@ -17,30 +17,34 @@ spec:
           replicaCount: 1
           config:
             persistence:
-              default:
-                sql:
-                  createDatabase: true
-                  manageSchema: true
-                  pluginName: "mysql8"
-                  driverName: "mysql8"
-                  databaseName: "temporal"
-                  connectAddr: "mysql.ecommerce.svc.cluster.local:3306"
-                  connectProtocol: "tcp"
-                  user: "root"
-                  existingSecret: "mysql-admin-credentials"
-                  secretKey: "admin-password"
-              visibility:
-                sql:
-                  createDatabase: true
-                  manageSchema: true
-                  pluginName: "mysql8"
-                  driverName: "mysql8"
-                  databaseName: "temporal_visibility"
-                  connectAddr: "mysql.ecommerce.svc.cluster.local:3306"
-                  connectProtocol: "tcp"
-                  user: "root"
-                  existingSecret: "mysql-admin-credentials"
-                  secretKey: "admin-password"
+              defaultStore: default
+              visibilityStore: visibility
+              
+              datastores:
+                default:
+                  sql:
+                    createDatabase: true
+                    manageSchema: true
+                    pluginName: "mysql8"
+                    driverName: "mysql8"
+                    databaseName: "temporal"
+                    connectAddr: "mysql.ecommerce.svc.cluster.local:3306"
+                    connectProtocol: "tcp"
+                    user: "root"
+                    existingSecret: "mysql-admin-credentials"
+                    secretKey: "admin-password"
+                visibility:
+                  sql:
+                    createDatabase: true
+                    manageSchema: true
+                    pluginName: "mysql8"
+                    driverName: "mysql8"
+                    databaseName: "temporal_visibility"
+                    connectAddr: "mysql.ecommerce.svc.cluster.local:3306"
+                    connectProtocol: "tcp"
+                    user: "root"
+                    existingSecret: "mysql-admin-credentials"
+                    secretKey: "admin-password"
         web:
           enabled: true
   destination:
