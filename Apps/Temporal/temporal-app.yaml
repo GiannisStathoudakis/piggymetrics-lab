@@ -49,7 +49,7 @@ spec:
           enabled: true
   destination:
     server: 'https://kubernetes.default.svc'
-    namespace: ecommerce
+    namespace: temporal
   syncPolicy:
     automated:
       prune: true
