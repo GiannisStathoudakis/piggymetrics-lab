@@ -23,7 +23,7 @@
     - name: 02. Fetch MySQL admin password dynamically from Vault
       ansible.builtin.shell: >
         {{ kubectl_cmd }} exec -n vault vault-0 -- sh -c "export VAULT_TOKEN='$VAULT_TOKEN'; 
-        vault kv get -field=admin-password secret/myql"
+        vault kv get -field=admin-password secret/mysql"
       environment:
         VAULT_TOKEN: "{{ root_token }}"
       register: mysql_admin_pass
